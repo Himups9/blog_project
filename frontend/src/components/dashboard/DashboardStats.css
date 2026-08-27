@@ -1,0 +1,263 @@
+/* frontend/src/components/dashboard/DashboardStats.css */
+
+.dashboard-stats {
+    padding: 1.5rem 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.stat-card.primary .stat-icon {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.stat-card.success .stat-icon {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.stat-card.danger .stat-icon {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.stat-card.warning .stat-icon {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.stat-info h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: #1a202c;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.stat-subtitle {
+    font-size: 0.8rem;
+    color: #a0aec0;
+}
+
+/* Quick Stats */
+.stats-quick {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.quick-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f7fafc;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.quick-label {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.quick-value {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+/* Top Posts List */
+.top-posts-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.top-post-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.top-post-item:last-child {
+    border-bottom: none;
+}
+
+.top-post-title {
+    display: block;
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.top-post-stats {
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+/* Comments List */
+.recent-comments-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.comment-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-author {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #a0aec0;
+}
+
+.comment-text {
+    margin: 0 0 0.25rem 0;
+    color: #4a5568;
+    font-size: 0.95rem;
+}
+
+.comment-blog {
+    font-size: 0.8rem;
+    color: #718096;
+}
+
+/* Category Distribution */
+.category-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.category-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.category-name {
+    min-width: 100px;
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+.category-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.category-count {
+    min-width: 30px;
+    text-align: right;
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+/* Empty State */
+.empty-state {
+    color: #a0aec0;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+/* Loading */
+.dashboard-stats-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

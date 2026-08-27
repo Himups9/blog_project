@@ -1,0 +1,8 @@
+export const COMMENT_STATUS = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  SPAM: "SPAM",
+  REJECTED: "REJECTED",
+};
+
+export default COMMENT_STATUS;

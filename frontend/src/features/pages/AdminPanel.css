@@ -1,0 +1,116 @@
+/* frontend/src/pages/AdminPanel.css */
+
+.admin-panel {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    font-size: 2.5rem;
+    color: #1a202c;
+    margin: 0 0 0.25rem 0;
+}
+
+.admin-header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.admin-section {
+    margin-bottom: 2.5rem;
+}
+
+.admin-section h2 {
+    font-size: 1.25rem;
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.admin-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.admin-stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 0.25rem;
+}
+
+.admin-stat-label {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.admin-stat-sub {
+    color: #a0aec0;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.admin-list {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.admin-list-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item-rank {
+    font-weight: 600;
+    color: #a0aec0;
+    margin-right: 1rem;
+    min-width: 40px;
+}
+
+.list-item-name {
+    flex: 1;
+    color: #2d3748;
+}
+
+.list-item-count {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.admin-loading,
+.admin-access-denied {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.admin-access-denied h2 {
+    color: #ef4444;
+}
+
+.admin-access-denied p {
+    color: #718096;
+}

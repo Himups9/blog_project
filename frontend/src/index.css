@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap");
+@import "tailwindcss";
+
+:root {
+    background-color: rgb(204, 205, 210);
+}
+@theme {
+  --font-sans: "Sora", Arial, sans-serif;
+}
+html {
+    scroll-behavior: smooth;
+}
+.gradient-bg {
+    background: linear-gradient(
+        to bottom right,
+        #053450,
+        #016398,
+        #053450
+    );
+
+    color: white;
+}
+@media (max-width: 1023px) {
+  .mobile-bg-header {
+    background: linear-gradient(
+      to top right,
+      #053450,
+      #016398
+    );
+  }
+}
+
+.btn-primary {
+    @apply bg-linear-to-r
+    from-[#f1920e]
+    via-[#f6a740]
+    to-[#f1920e]
+    hover:bg-linear-to-r
+    hover:from-[#043450]
+    hover:via-[#0b4f7b]
+    hover:to-[#04344F]
+    text-white
+    transition-all
+    duration-500;
+    border-radius: 15px;
+}
+h1, h2 {
+  font-family: poppins;
+}

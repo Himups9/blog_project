@@ -1,0 +1,5 @@
+# Unreferenced legacy static contact-page export. The active contact page uses
+# ContactForm.jsx and its service-backed submission flow.
+src/features/pages/contact/components/form.jsx
+# Unreferenced experiment containing a commented-out duplicate Hero body.
+src/features/pages/home/components/hero2fortest.jsx

@@ -1,0 +1,149 @@
+/* frontend/src/components/blog/RichTextEditor.css */
+
+.rich-text-editor {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 2px;
+    padding: 0 4px;
+    border-right: 1px solid #e2e8f0;
+}
+
+.toolbar-group:last-child {
+    border-right: none;
+}
+
+.menu-button {
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4a5568;
+    transition: all 0.2s ease;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-button:hover {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+.menu-button.active {
+    background: #667eea;
+    color: white;
+}
+
+.menu-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.editor-content {
+    padding: 20px;
+    min-height: 300px;
+    outline: none;
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.editor-content p {
+    margin-bottom: 1rem;
+}
+
+.editor-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 1.5rem 0 1rem;
+}
+
+.editor-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.75rem;
+}
+
+.editor-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+}
+
+.editor-content ul,
+.editor-content ol {
+    margin: 0.5rem 0 1rem 1.5rem;
+}
+
+.editor-content li {
+    margin-bottom: 0.25rem;
+}
+
+.editor-content blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #4a5568;
+}
+
+.editor-content code {
+    background: #f7fafc;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.editor-content pre {
+    background: #2d3748;
+    color: #f7fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.editor-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.editor-content a {
+    color: #667eea;
+    text-decoration: underline;
+}
+
+.editor-content a:hover {
+    color: #764ba2;
+}
+
+.ProseMirror-focused {
+    outline: none;
+}
+
+.ProseMirror .is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #a0aec0;
+    pointer-events: none;
+    height: 0;
+}
