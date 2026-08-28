@@ -1,5 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const folders = [
     "uploads/temp",
@@ -24,19 +28,13 @@ const folders = [
 ];
 
 export default function createUploadFolders() {
-
-    folders.forEach(folder => {
-
-        const folderPath = path.resolve(folder);
+    folders.forEach((folder) => {
+        const folderPath = path.resolve(__dirname, "..", folder);
 
         if (!fs.existsSync(folderPath)) {
-
             fs.mkdirSync(folderPath, {
                 recursive: true,
             });
-
         }
-
     });
-
 }
