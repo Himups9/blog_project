@@ -1,38 +1,83 @@
 // backend/src/modules/settings/settings.controller.js
 
+import { put } from "@vercel/blob";
+import crypto from "crypto";
+
 import settingsService from "./settings.service.js";
 
-/**
- * Build uploaded image paths.
- *
- * Multer stores uploaded files in req.files.
- */
-const getUploadedImages = (files = {}) => {
+/*
+|--------------------------------------------------------------------------
+| Upload Image to Vercel Blob
+|--------------------------------------------------------------------------
+*/
+
+const uploadImage = async (file, folder) => {
+    if (!file) {
+        return null;
+    }
+
+    const extension =
+        file.originalname
+            ?.split(".")
+            .pop()
+            ?.toLowerCase() || "bin";
+
+    const filename =
+        `${folder}/${crypto.randomUUID()}.${extension}`;
+
+    const blob = await put(
+        filename,
+        file.buffer,
+        {
+            access: "public",
+            contentType: file.mimetype,
+        }
+    );
+
+    return blob.url;
+};
+
+/*
+|--------------------------------------------------------------------------
+| Upload Settings Images
+|--------------------------------------------------------------------------
+*/
+
+const getUploadedImages = async (files = {}) => {
     const images = {};
 
     if (files.logo?.[0]) {
-        images.logo = `/uploads/setting/original/${files.logo[0].filename}`;
+        images.logo = await uploadImage(
+            files.logo[0],
+            "settings/logo"
+        );
     }
 
     if (files.favicon?.[0]) {
-        images.favicon = `/uploads/setting/original/${files.favicon[0].filename}`;
+        images.favicon = await uploadImage(
+            files.favicon[0],
+            "settings/favicon"
+        );
     }
 
     return images;
 };
 
-/**
- * GET /api/settings
- *
- * Get global site settings.
- */
+/*
+|--------------------------------------------------------------------------
+| GET /api/settings
+|--------------------------------------------------------------------------
+*/
+
 const getSettings = async (req, res, next) => {
     try {
-        const settings = await settingsService.getSettings();
+        const settings =
+            await settingsService.getSettings();
 
         return res.status(200).json({
             success: true,
-            message: "Settings retrieved successfully.",
+            message:
+                "Settings retrieved successfully.",
             data: settings,
         });
     } catch (error) {
@@ -40,14 +85,16 @@ const getSettings = async (req, res, next) => {
     }
 };
 
-/**
- * POST /api/settings
- *
- * Create the initial global settings record.
- */
+/*
+|--------------------------------------------------------------------------
+| POST /api/settings
+|--------------------------------------------------------------------------
+*/
+
 const createSettings = async (req, res, next) => {
     try {
-        const uploadedImages = getUploadedImages(req.files);
+        const uploadedImages =
+            await getUploadedImages(req.files);
 
         const data = {
             ...req.body,
@@ -59,7 +106,8 @@ const createSettings = async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            message: "Settings created successfully.",
+            message:
+                "Settings created successfully.",
             data: settings,
         });
     } catch (error) {
@@ -67,14 +115,16 @@ const createSettings = async (req, res, next) => {
     }
 };
 
-/**
- * PUT /api/settings
- *
- * Update the global site settings.
- */
+/*
+|--------------------------------------------------------------------------
+| PUT /api/settings
+|--------------------------------------------------------------------------
+*/
+
 const updateSettings = async (req, res, next) => {
     try {
-        const uploadedImages = getUploadedImages(req.files);
+        const uploadedImages =
+            await getUploadedImages(req.files);
 
         const data = {
             ...req.body,
@@ -86,7 +136,8 @@ const updateSettings = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: "Settings updated successfully.",
+            message:
+                "Settings updated successfully.",
             data: settings,
         });
     } catch (error) {

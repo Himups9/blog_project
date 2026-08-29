@@ -1,36 +1,11 @@
 // backend/src/models/settings/settings.upload.js
 
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import crypto from "crypto";
 
 import {
     SETTINGS_IMAGE_MIME_TYPES,
     SETTINGS_IMAGE_MAX_SIZE,
 } from "./settings.constants.js";
-
-/*
-|--------------------------------------------------------------------------
-| Upload Directory
-|--------------------------------------------------------------------------
-|
-| Vercel only provides a writable temporary filesystem at /tmp.
-| Do NOT write uploads into /var/task or the project source directory.
-|
-*/
-
-const uploadDirectory = "/tmp/uploads/setting/original";
-
-/*
-|--------------------------------------------------------------------------
-| Ensure Upload Directory Exists
-|--------------------------------------------------------------------------
-*/
-
-fs.mkdirSync(uploadDirectory, {
-    recursive: true,
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +15,9 @@ fs.mkdirSync(uploadDirectory, {
 
 const fileFilter = (req, file, cb) => {
     if (
-        !SETTINGS_IMAGE_MIME_TYPES.includes(file.mimetype)
+        !SETTINGS_IMAGE_MIME_TYPES.includes(
+            file.mimetype
+        )
     ) {
         return cb(
             new Error(
@@ -55,31 +32,19 @@ const fileFilter = (req, file, cb) => {
 
 /*
 |--------------------------------------------------------------------------
-| Storage
+| Memory Storage
 |--------------------------------------------------------------------------
+|
+| Files are kept in memory temporarily.
+| They are then uploaded to persistent storage.
+|
 */
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDirectory);
-    },
-
-    filename: (req, file, cb) => {
-        const extension = path
-            .extname(file.originalname)
-            .toLowerCase();
-
-        const filename = `${Date.now()}-${crypto
-            .randomBytes(8)
-            .toString("hex")}${extension}`;
-
-        cb(null, filename);
-    },
-});
+const storage = multer.memoryStorage();
 
 /*
 |--------------------------------------------------------------------------
-| Multer
+| Multer Configuration
 |--------------------------------------------------------------------------
 */
 
@@ -96,26 +61,26 @@ const settingsUpload = multer({
 
 /*
 |--------------------------------------------------------------------------
-| Fields
+| Settings Image Upload
 |--------------------------------------------------------------------------
+|
+| Accept:
+| - logo
+| - favicon
+|
 */
 
-const settingsImageUpload = settingsUpload.fields([
-    {
-        name: "logo",
-        maxCount: 1,
-    },
-    {
-        name: "favicon",
-        maxCount: 1,
-    },
-]);
-
-/*
-|--------------------------------------------------------------------------
-| Export
-|--------------------------------------------------------------------------
-*/
+const settingsImageUpload =
+    settingsUpload.fields([
+        {
+            name: "logo",
+            maxCount: 1,
+        },
+        {
+            name: "favicon",
+            maxCount: 1,
+        },
+    ]);
 
 export {
     settingsImageUpload,
