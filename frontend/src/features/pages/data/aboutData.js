@@ -17,7 +17,7 @@ import {
     Briefcase,
     Award,
     Globe,
-} from "Lucide-react";
+} from "lucide-react";
 
 export const aboutIntro = [
     {
