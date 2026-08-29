@@ -17,6 +17,7 @@ import Gallery from "../gallery/pages/Gallery";
 import CreateGallery from "../gallery/pages/CreateGallery";
 import EditGallery from "../gallery/pages/EditGallery";
 import GalleryPreview from "../gallery/components/GalleryPreview";
+import AdminGalleryPreview from "../gallery/components/AdminGalleryPreview";
 
 
 
@@ -93,7 +94,7 @@ const adminRoutes = [
 
     {
         path: "gallery/:id",
-        element: <GalleryPreview />,
+        element: <AdminGalleryPreview />,
     },
 ];
 

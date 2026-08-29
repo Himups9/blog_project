@@ -32,16 +32,12 @@ const HomeCard = () => {
 
                         {/* Title */}
                         <h1 className="mt-8 max-w-3xl text-4xl font-semibold leading-none tracking-tight md:text-6xl">
-                            Legal guidance
-                            <br />
-                            made accessible.
+                            Technology made accessible.
                         </h1>
 
                         {/* Description */}
                         <p className="mt-6 max-w-2xl text-sm leading-8 text-slate-300">
-                            Suraksha's practice extends beyond representation into
-                            mediation, organizational advisory work, and training
-                            for local bodies on law and conflict resolution.
+                            Himalaya Tech combines technology and management expertise to deliver digital solutions, optimize business operations, strengthen organizational performance, and support sustainable growth.
                         </p>
 
                         {/* Button */}

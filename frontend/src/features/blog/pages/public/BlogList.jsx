@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Clock3, Search, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import PageTransition from "../../../pages/shared/components/PageTransition";
+import Hero from "../../../pages/shared/components/Hero";
+import { heroData } from "../../../pages/data/heroData";
+
 import useBlog from "../../hooks/useBlog";
 import { getImageUrl } from "../../../utils/imageUrl";
 import { formatBlogDate } from "../../utils/formatBlogDate";
@@ -156,52 +160,55 @@ const BlogList = () => {
     }
 
     return (
-        <section className="bg-slate-50 py-8 md:py-12">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {filteredBlogs.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center text-xl font-semibold text-slate-700">
-                        No blogs found.
-                    </div>
-                ) : (
-                    <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)]">
-                        <main className="space-y-8">
-                            {featuredBlogs.map((blog) => (
-                                <LargeBlogCard key={blog.id} blog={blog} />
-                            ))}
-                        </main>
-
-                        <aside className="space-y-3 lg:sticky lg:top-6">
-                            <div className="rounded-2xl">
-                                <label htmlFor="public-blog-search" className="sr-only">
-                                    Search blogs
-                                </label>
-                                <div className="relative">
-                                    <Search
-                                        size={18}
-                                        aria-hidden="true"
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                                    />
-                                    <input
-                                        id="public-blog-search"
-                                        type="search"
-                                        placeholder="Search blogs..."
-                                        value={search}
-                                        onChange={(event) => setSearch(event.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {remainingBlogs.map((blog) => (
-                                    <SmallBlogCard key={blog.id} blog={blog} />
+        <PageTransition>
+            <Hero {...heroData.blog} />
+            <section className="bg-slate-50 py-8 md:py-12">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {filteredBlogs.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center text-xl font-semibold text-slate-700">
+                            No blogs found.
+                        </div>
+                    ) : (
+                        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)]">
+                            <main className="space-y-8">
+                                {featuredBlogs.map((blog) => (
+                                    <LargeBlogCard key={blog.id} blog={blog} />
                                 ))}
-                            </div>
-                        </aside>
-                    </div>
-                )}
-            </div>
-        </section>
+                            </main>
+
+                            <aside className="space-y-3 lg:sticky lg:top-6">
+                                <div className="rounded-2xl">
+                                    <label htmlFor="public-blog-search" className="sr-only">
+                                        Search blogs
+                                    </label>
+                                    <div className="relative">
+                                        <Search
+                                            size={18}
+                                            aria-hidden="true"
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                        />
+                                        <input
+                                            id="public-blog-search"
+                                            type="search"
+                                            placeholder="Search blogs..."
+                                            value={search}
+                                            onChange={(event) => setSearch(event.target.value)}
+                                            className="w-full rounded-xl border border-slate-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {remainingBlogs.map((blog) => (
+                                        <SmallBlogCard key={blog.id} blog={blog} />
+                                    ))}
+                                </div>
+                            </aside>
+                        </div>
+                    )}
+                </div>
+            </section>
+        </PageTransition>
     );
 };
 

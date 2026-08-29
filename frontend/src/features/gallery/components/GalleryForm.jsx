@@ -4,8 +4,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import FormInput from "../../pages/shared/forms/FormInput";
 import FormTextarea from "../../pages/shared/forms/formTextarea";
-import FormFileUpload from "../../pages/shared/forms/FormFileUpload";
 import SubmitButton from "../../pages/shared/forms/SubmitButton";
+import GalleryUpload from "./GalleryUpload";
 
 import { gallerySchema } from "../schemas/gallerySchema";
 
@@ -28,17 +28,19 @@ const GalleryForm = ({
     } = useForm({
         resolver: yupResolver(gallerySchema),
         defaultValues: {
-            title: initialData?.title || "",
-            altText: initialData?.altText || "",
+            title: "",
+            altText: "",
             image: null,
         },
     });
 
     const selectedImage = watch("image");
 
-    // =========================================================
-    // Reset when initial data changes
-    // =========================================================
+    /*
+    |--------------------------------------------------------------------------
+    | Reset form when initialData changes
+    |--------------------------------------------------------------------------
+    */
 
     useEffect(() => {
         reset({
@@ -48,56 +50,65 @@ const GalleryForm = ({
         });
     }, [initialData, reset]);
 
-    // =========================================================
-    // Image selection
-    // =========================================================
+    /*
+    |--------------------------------------------------------------------------
+    | Image Change
+    |--------------------------------------------------------------------------
+    */
 
-    const handleImageChange = (event) => {
-        const file = event.target.files?.[0] || null;
-
-        setValue("image", file, {
+    const handleImageChange = (file) => {
+        setValue("image", file || null, {
             shouldValidate: true,
             shouldDirty: true,
+            shouldTouch: true,
         });
     };
 
-    // =========================================================
-    // Submit
-    // =========================================================
+    /*
+    |--------------------------------------------------------------------------
+    | Submit
+    |--------------------------------------------------------------------------
+    */
 
-    const submitHandler = (data) => {
+    const submitHandler = async (data) => {
         if (!onSubmit) {
             return;
         }
 
-        /*
-         * Create FormData because the backend expects
-         * multipart/form-data for gallery uploads.
-         */
-
         const formData = new FormData();
 
-        formData.append("title", data.title);
+        formData.append("title", data.title.trim());
 
-        if (data.altText) {
-            formData.append("altText", data.altText);
+        if (data.altText?.trim()) {
+            formData.append("altText", data.altText.trim());
         }
 
         /*
-         * Image is required when creating,
-         * but optional when editing.
-         */
+        |--------------------------------------------------------------------------
+        | Image
+        |--------------------------------------------------------------------------
+        |
+        | Create:
+        |   Image is required by gallerySchema.
+        |
+        | Edit:
+        |   Image is optional. If no new image is selected,
+        |   the existing image remains unchanged.
+        |
+        */
 
-        if (data.image) {
+        if (data.image instanceof File) {
             formData.append("image", data.image);
         }
 
-        onSubmit(formData);
+        await onSubmit(formData);
     };
 
-    // =========================================================
-    // Submit button text
-    // =========================================================
+    /*
+    |--------------------------------------------------------------------------
+    | Button Text
+    |--------------------------------------------------------------------------
+    */
 
     const buttonText =
         submitText ||
@@ -109,10 +120,11 @@ const GalleryForm = ({
         <form
             onSubmit={handleSubmit(submitHandler)}
             className="space-y-8"
+            noValidate
         >
-            {/* =================================================
+            {/* =========================================================
                 Gallery Information
-            ================================================= */}
+            ========================================================= */}
 
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
                 <div className="mb-6">
@@ -151,9 +163,9 @@ const GalleryForm = ({
                 </div>
             </div>
 
-            {/* =================================================
+            {/* =========================================================
                 Gallery Image
-            ================================================= */}
+            ========================================================= */}
 
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
                 <div className="mb-6">
@@ -163,79 +175,30 @@ const GalleryForm = ({
 
                     <p className="mt-1 text-sm text-gray-500">
                         Upload a JPG, PNG, or WebP image.
+                        Maximum size: 5 MB.
                     </p>
                 </div>
 
-                <FormFileUpload
-                    label="Image"
-                    name="image"
-                    accept="image/jpeg,image/png,image/webp"
+                <GalleryUpload
+                    value={selectedImage}
                     onChange={handleImageChange}
                     error={errors.image}
-                    required={!isEditMode}
+                    disabled={loading}
+                    existingImage={
+                        isEditMode
+                            ? initialData?.thumbnailUrl ||
+                              initialData?.image ||
+                              initialData?.imageUrl
+                            : null
+                    }
                 />
-
-                {/* =================================================
-                    Selected New Image
-                ================================================= */}
-
-                {selectedImage && (
-                    <div className="mt-4 rounded-lg bg-gray-50 p-4">
-                        <p className="text-sm font-medium text-gray-800">
-                            Selected image
-                        </p>
-
-                        <p className="mt-1 break-all text-sm text-gray-500">
-                            {selectedImage.name}
-                        </p>
-
-                        <p className="mt-1 text-xs text-gray-400">
-                            {(
-                                selectedImage.size /
-                                (1024 * 1024)
-                            ).toFixed(2)}{" "}
-                            MB
-                        </p>
-                    </div>
-                )}
-
-                {/* =================================================
-                    Existing Image
-                ================================================= */}
-
-                {isEditMode &&
-                    initialData?.thumbnailUrl &&
-                    !selectedImage && (
-                        <div className="mt-5">
-                            <p className="mb-2 text-sm font-medium text-gray-700">
-                                Current image
-                            </p>
-
-                            <img
-                                src={getImageUrl(
-                                    initialData.thumbnailUrl
-                                )}
-                                alt={
-                                    initialData.altText ||
-                                    initialData.title ||
-                                    "Current gallery image"
-                                }
-                                className="h-40 w-40 rounded-lg border border-gray-200 object-cover"
-                            />
-
-                            <p className="mt-2 text-xs text-gray-500">
-                                Select a new image above to
-                                replace this image.
-                            </p>
-                        </div>
-                    )}
             </div>
 
-            {/* =================================================
+            {/* =========================================================
                 Submit
-            ================================================= */}
+            ========================================================= */}
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
                 <SubmitButton
                     loading={loading}
                     text={buttonText}
@@ -244,38 +207,6 @@ const GalleryForm = ({
             </div>
         </form>
     );
-};
-
-// =============================================================
-// Build Gallery Image URL
-// =============================================================
-
-const getImageUrl = (imagePath) => {
-    if (!imagePath) {
-        return "";
-    }
-
-    if (
-        imagePath.startsWith("http://") ||
-        imagePath.startsWith("https://")
-    ) {
-        return imagePath;
-    }
-
-    const apiBaseUrl =
-        import.meta.env.VITE_API_BASE_URL ||
-        "http://127.0.0.1:5001/api";
-
-    /*
-     * Remove /api because uploaded files are served
-     * from the backend root:
-     *
-     * http://127.0.0.1:5001/uploads/...
-     */
-
-    const serverUrl = apiBaseUrl.replace(/\/api\/?$/, "");
-
-    return `${serverUrl}/uploads/${imagePath}`;
 };
 
 export default GalleryForm;

@@ -1,7 +1,11 @@
+import path from "path";
+import { promises as fs } from "fs";
+
 import * as galleryRepository from "./gallery.repository.js";
 
 import { deleteUploadedFiles } from "../../utils/file.js";
 import { optimizeImage } from "../../utils/image.js";
+import createGalleryImage from "../../utils/createGalleryImage.js";
 
 import {
     validateGalleryData,
@@ -14,9 +18,141 @@ import {
     mapGalleryList,
 } from "./gallery.mapper.js";
 
-/**
- * Create a gallery item.
- */
+/*
+|--------------------------------------------------------------------------
+| Gallery upload directories
+|--------------------------------------------------------------------------
+*/
+
+const UPLOADS_DIRECTORY = path.resolve(
+    process.cwd(),
+    "src/uploads"
+);
+
+const COMPOSED_DIRECTORY = path.resolve(
+    UPLOADS_DIRECTORY,
+    "gallery/composed"
+);
+
+/*
+|--------------------------------------------------------------------------
+| Convert stored image path to absolute filesystem path
+|--------------------------------------------------------------------------
+|
+| Example database path:
+|
+| gallery/optimized/example.webp
+|
+| becomes:
+|
+| src/uploads/gallery/optimized/example.webp
+|
+*/
+
+const getAbsoluteUploadPath = (imagePath) => {
+    if (!imagePath) {
+        return null;
+    }
+
+    /*
+     * If already absolute, use it directly.
+     */
+    if (path.isAbsolute(imagePath)) {
+        return imagePath;
+    }
+
+    /*
+     * Remove leading slashes.
+     */
+    const normalizedPath = imagePath.replace(
+        /^[/\\]+/,
+        ""
+    );
+
+    /*
+     * If the database contains uploads/...
+     * remove uploads because UPLOADS_DIRECTORY
+     * already points to src/uploads.
+     */
+    const relativePath =
+        normalizedPath.startsWith("uploads/")
+            ? normalizedPath.substring(
+                  "uploads/".length
+              )
+            : normalizedPath;
+
+    return path.resolve(
+        UPLOADS_DIRECTORY,
+        relativePath
+    );
+};
+
+/*
+|--------------------------------------------------------------------------
+| Create composed gallery image
+|--------------------------------------------------------------------------
+*/
+
+const createComposedGalleryImage = async ({
+    sourcePath,
+    title,
+    description,
+    originalImagePath,
+}) => {
+    if (!sourcePath) {
+        throw new Error(
+            "Source image path is required for composition."
+        );
+    }
+
+    /*
+     * Ensure composed directory exists.
+     */
+    await fs.mkdir(COMPOSED_DIRECTORY, {
+        recursive: true,
+    });
+
+    /*
+     * Use the original/optimized filename
+     * but always output JPEG because
+     * createGalleryImage() generates JPEG.
+     */
+    const sourceFilename = path.basename(
+        sourcePath
+    );
+
+    const filenameWithoutExtension =
+        path.parse(sourceFilename).name;
+
+    const composedFilename = `${filenameWithoutExtension}-composed.jpg`;
+
+    const outputPath = path.join(
+        COMPOSED_DIRECTORY,
+        composedFilename
+    );
+
+    /*
+     * Create image with permanent text overlay.
+     */
+    await createGalleryImage({
+        inputPath: sourcePath,
+        outputPath,
+        title: title || "",
+        description: description || "",
+    });
+
+    /*
+     * Return database-relative path.
+     */
+    return `gallery/composed/${composedFilename}`;
+};
+
+/*
+|--------------------------------------------------------------------------
+| Create Gallery
+|--------------------------------------------------------------------------
+*/
+
 export const createGallery = async ({
     title,
     altText,
@@ -24,7 +160,7 @@ export const createGallery = async ({
     uploadedById,
 }) => {
     /*
-     * Validate gallery metadata.
+     * Validate metadata.
      */
     const validation =
         validateGalleryData({
@@ -38,8 +174,7 @@ export const createGallery = async ({
         );
 
         error.statusCode = 400;
-        error.errors =
-            validation.errors;
+        error.errors = validation.errors;
 
         throw error;
     }
@@ -100,6 +235,32 @@ export const createGallery = async ({
     }
 
     /*
+     * Convert optimized image path
+     * to filesystem path.
+     */
+    const optimizedAbsolutePath =
+        getAbsoluteUploadPath(
+            imagePaths.optimizedPath
+        );
+
+    /*
+     * Create permanent composed image.
+     *
+     * title     -> gallery.title
+     * altText   -> description shown on image
+     */
+    const composedPath =
+        await createComposedGalleryImage({
+            sourcePath:
+                optimizedAbsolutePath,
+
+            title: title.trim(),
+
+            description:
+                altText?.trim() || "",
+        });
+
+    /*
      * Create database record.
      */
     const gallery =
@@ -109,13 +270,23 @@ export const createGallery = async ({
             altText:
                 altText?.trim() || null,
 
-            imageUrl:
-                imagePaths.optimizedPath,
+            /*
+             * IMPORTANT:
+             * Public/admin image should use
+             * the composed image.
+             */
+            imageUrl: composedPath,
 
+            /*
+             * Keep original image separately.
+             */
             originalUrl:
                 imagePaths.originalPath ??
                 null,
 
+            /*
+             * Thumbnail remains the normal thumbnail.
+             */
             thumbnailUrl:
                 imagePaths.thumbnailPath ??
                 null,
@@ -124,7 +295,7 @@ export const createGallery = async ({
                 file.size ?? null,
 
             mimeType:
-                file.mimetype ?? null,
+                "image/jpeg",
 
             uploadedById,
         });
@@ -132,9 +303,12 @@ export const createGallery = async ({
     return mapGallery(gallery);
 };
 
-/**
- * Get gallery items.
- */
+/*
+|--------------------------------------------------------------------------
+| Get Gallery Items
+|--------------------------------------------------------------------------
+*/
+
 export const getGallery = async ({
     search,
     page,
@@ -172,10 +346,9 @@ export const getGallery = async ({
         });
 
     return {
-        data:
-            mapGalleryList(
-                result.items
-            ),
+        data: mapGalleryList(
+            result.items
+        ),
 
         pagination: {
             page:
@@ -196,9 +369,12 @@ export const getGallery = async ({
     };
 };
 
-/**
- * Get a gallery item by ID.
- */
+/*
+|--------------------------------------------------------------------------
+| Get Gallery By ID
+|--------------------------------------------------------------------------
+*/
+
 export const getGalleryById = async (
     id
 ) => {
@@ -235,14 +411,12 @@ export const getGalleryById = async (
     return mapGallery(gallery);
 };
 
-/**
- * Update a gallery item.
- *
- * Supports:
- * - title update
- * - altText update
- * - optional image replacement
- */
+/*
+|--------------------------------------------------------------------------
+| Update Gallery
+|--------------------------------------------------------------------------
+*/
+
 export const updateGallery = async (
     id,
     {
@@ -270,7 +444,7 @@ export const updateGallery = async (
     }
 
     /*
-     * Find existing Gallery item.
+     * Find existing item.
      */
     const existingGallery =
         await galleryRepository.findGalleryById(
@@ -288,7 +462,7 @@ export const updateGallery = async (
     }
 
     /*
-     * Validate supplied metadata.
+     * Validate metadata.
      */
     if (
         title !== undefined ||
@@ -320,74 +494,162 @@ export const updateGallery = async (
         }
     }
 
+    /*
+     * Prepare update data.
+     */
     const data = {};
+
+    const finalTitle =
+        title !== undefined
+            ? title.trim()
+            : existingGallery.title;
+
+    const finalAltText =
+        altText !== undefined
+            ? altText?.trim() || null
+            : existingGallery.altText;
 
     /*
      * Update title.
      */
     if (title !== undefined) {
-        data.title =
-            title.trim();
+        data.title = finalTitle;
     }
 
     /*
-     * Update alt text.
+     * Update description/alt text.
      */
     if (altText !== undefined) {
-        data.altText =
-            altText?.trim() || null;
+        data.altText = finalAltText;
     }
 
     /*
-     * Replace image.
-     */
-    if (file) {
-        const imagePaths =
-            await optimizeImage(
-                file,
-                "gallery",
-                {
-                    width: 1200,
-                    quality: 80,
-                    generateThumbnail: true,
-                    preserveOriginal: true,
-                    returnPaths: true,
-                }
-            );
+    |--------------------------------------------------------------------------
+    | Recreate composed image
+    |--------------------------------------------------------------------------
+    |
+    | Important:
+    |
+    | Even if no new file is uploaded, we must recreate
+    | the composed image when title or altText changes.
+    |
+    */
 
-        if (
-            !imagePaths ||
-            !imagePaths.optimizedPath
-        ) {
-            const error = new Error(
-                "Image processing failed."
-            );
+    if (
+        file ||
+        title !== undefined ||
+        altText !== undefined
+    ) {
+        let sourceImagePath;
 
-            error.statusCode = 500;
+        /*
+         * New image uploaded.
+         */
+        if (file) {
+            const imagePaths =
+                await optimizeImage(
+                    file,
+                    "gallery",
+                    {
+                        width: 1200,
+                        quality: 80,
+                        generateThumbnail: true,
+                        preserveOriginal: true,
+                        returnPaths: true,
+                    }
+                );
 
-            throw error;
+            if (
+                !imagePaths ||
+                !imagePaths.optimizedPath
+            ) {
+                const error = new Error(
+                    "Image processing failed."
+                );
+
+                error.statusCode = 500;
+
+                throw error;
+            }
+
+            sourceImagePath =
+                getAbsoluteUploadPath(
+                    imagePaths.optimizedPath
+                );
+
+            /*
+             * Store new image paths.
+             */
+            data.originalUrl =
+                imagePaths.originalPath ??
+                null;
+
+            data.thumbnailUrl =
+                imagePaths.thumbnailPath ??
+                null;
+
+            data.fileSize =
+                file.size ?? null;
+
+            data.mimeType =
+                "image/jpeg";
+
+            /*
+             * Create new composed image.
+             */
+            data.imageUrl =
+                await createComposedGalleryImage(
+                    {
+                        sourcePath:
+                            sourceImagePath,
+
+                        title:
+                            finalTitle,
+
+                        description:
+                            finalAltText || "",
+                    }
+                );
+        } else {
+            /*
+             * No new image.
+             *
+             * Reuse the existing original/optimized
+             * source image to create a new composed image.
+             */
+            const existingSource =
+                existingGallery.originalUrl ||
+                existingGallery.imageUrl;
+
+            sourceImagePath =
+                getAbsoluteUploadPath(
+                    existingSource
+                );
+
+            /*
+             * If originalUrl points to the original
+             * uploaded image, use it as source.
+             *
+             * Otherwise use current image.
+             */
+            data.imageUrl =
+                await createComposedGalleryImage(
+                    {
+                        sourcePath:
+                            sourceImagePath,
+
+                        title:
+                            finalTitle,
+
+                        description:
+                            finalAltText || "",
+                    }
+                );
         }
-
-        data.imageUrl =
-            imagePaths.optimizedPath;
-
-        data.originalUrl =
-            imagePaths.originalPath ??
-            null;
-
-        data.thumbnailUrl =
-            imagePaths.thumbnailPath ??
-            null;
-
-        data.fileSize =
-            file.size ?? null;
-
-        data.mimeType =
-            file.mimetype ?? null;
     }
 
     /*
-     * Prevent an empty update.
+     * Prevent empty update.
      */
     if (
         Object.keys(data).length === 0
@@ -407,13 +669,28 @@ export const updateGallery = async (
         );
 
     /*
-     * Delete old image files only after
-     * successful database update.
+    |--------------------------------------------------------------------------
+    | Delete old generated image
+    |--------------------------------------------------------------------------
+    |
+    | Only delete the old composed image when a new
+    | composed image was successfully created.
+    |
+    */
+
+    if (data.imageUrl) {
+        await deleteUploadedFiles([
+            existingGallery.imageUrl,
+        ]);
+    }
+
+    /*
+     * If a new uploaded file was supplied,
+     * delete the old original + thumbnail.
      */
     if (file) {
         await deleteUploadedFiles([
             existingGallery.originalUrl,
-            existingGallery.imageUrl,
             existingGallery.thumbnailUrl,
         ]);
     }
@@ -421,9 +698,12 @@ export const updateGallery = async (
     return mapGallery(gallery);
 };
 
-/**
- * Delete a gallery item.
- */
+/*
+|--------------------------------------------------------------------------
+| Delete Gallery
+|--------------------------------------------------------------------------
+*/
+
 export const deleteGallery = async (
     id
 ) => {
@@ -471,7 +751,7 @@ export const deleteGallery = async (
     );
 
     /*
-     * Delete physical image files.
+     * Delete all physical files.
      */
     await deleteUploadedFiles([
         existingGallery.originalUrl,

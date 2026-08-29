@@ -40,7 +40,7 @@ export const heroData = {
         description:
             "Explore our completed projects and creative digital work.",
         cardTitle: "Start Your Project",
-        buttonText: "Let's Talk",
+        buttonText: "Contact Us",
         buttonLink: "/contact",
     },
 

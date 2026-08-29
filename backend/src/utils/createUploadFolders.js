@@ -19,6 +19,7 @@ const folders = [
     "uploads/gallery/original",
     "uploads/gallery/optimized",
     "uploads/gallery/thumbnails",
+    "uploads/gallery/composed",
 
     "uploads/categories/original",
     "uploads/categories/optimized",

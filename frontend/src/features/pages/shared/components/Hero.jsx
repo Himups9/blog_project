@@ -24,7 +24,7 @@ const Hero = ({
             <div className="absolute right-[180px] top-[80px] h-[800px] w-[800px] rounded-full border-[100px] border-yellow-600/20"></div>
             <div className="absolute right-[-220px] top-[-260px] h-[700px] w-[700px] rounded-full border border-white/10"></div>
             <div className="absolute right-[-100px] top-[-140px] h-[500px] w-[500px] rounded-full border border-white/10"></div>
-            <div className="relative mx-auto max-w-7xl px-6 py-25 lg:px-8">
+            <div className="relative mx-auto max-w-7xl px-6 py-8 lg:px-8">
 
                 <div className="grid items-center gap-10 lg:grid-cols-2">
 

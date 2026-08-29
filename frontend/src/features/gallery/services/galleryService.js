@@ -1,6 +1,5 @@
 import api from "../../api";
 
-
 /**
  * Get gallery items
  */
@@ -12,16 +11,18 @@ export const getGallery = async (params = {}) => {
     return response.data;
 };
 
-
 /**
  * Get single gallery item
  */
 export const getGalleryById = async (id) => {
+    if (!id) {
+        throw new Error("Gallery ID is required.");
+    }
+
     const response = await api.get(`/gallery/${id}`);
 
     return response.data;
 };
-
 
 /**
  * Create gallery item
@@ -29,19 +30,19 @@ export const getGalleryById = async (id) => {
  * @param {FormData} formData
  */
 export const createGallery = async (formData) => {
+    if (!(formData instanceof FormData)) {
+        throw new Error(
+            "Gallery create data must be FormData."
+        );
+    }
+
     const response = await api.post(
         "/gallery",
-        formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
+        formData
     );
 
     return response.data;
 };
-
 
 /**
  * Update gallery item
@@ -49,34 +50,27 @@ export const createGallery = async (formData) => {
  * @param {string} id
  * @param {FormData|Object} data
  */
-export const updateGallery = async (
-    id,
-    data
-) => {
-    const isFormData =
-        data instanceof FormData;
+export const updateGallery = async (id, data) => {
+    if (!id) {
+        throw new Error("Gallery ID is required.");
+    }
 
     const response = await api.put(
         `/gallery/${id}`,
-        data,
-        isFormData
-            ? {
-                  headers: {
-                      "Content-Type":
-                          "multipart/form-data",
-                  },
-              }
-            : undefined
+        data
     );
 
     return response.data;
 };
 
-
 /**
  * Delete gallery item
  */
 export const deleteGallery = async (id) => {
+    if (!id) {
+        throw new Error("Gallery ID is required.");
+    }
+
     const response = await api.delete(
         `/gallery/${id}`
     );
