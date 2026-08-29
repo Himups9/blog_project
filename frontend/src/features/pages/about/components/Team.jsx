@@ -1,7 +1,7 @@
 import { team } from "../../data/aboutData";
 import Button from "../../shared/components/Button";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "Lucide-react";
+import { ArrowRight } from "lucide-react";
 const Team = () => {
     return (
         <section className="bg-[#edf5f4] py-28">
