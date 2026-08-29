@@ -6,7 +6,7 @@ import {
     getSettings,
     createSettings,
     updateSettings,
-} from "../../modules/settings/settings.controller.js";
+} from "./settings.controller.js";
 
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -22,6 +22,8 @@ const router = express.Router();
 | GET /api/settings
 |--------------------------------------------------------------------------
 | Public
+|
+| Retrieve the global site settings.
 |--------------------------------------------------------------------------
 */
 
@@ -35,6 +37,8 @@ router.get(
 | POST /api/settings
 |--------------------------------------------------------------------------
 | Admin only
+|
+| Create the initial global settings record.
 |--------------------------------------------------------------------------
 */
 
@@ -51,6 +55,8 @@ router.post(
 | PUT /api/settings
 |--------------------------------------------------------------------------
 | Admin only
+|
+| Update global settings.
 |--------------------------------------------------------------------------
 */
 
