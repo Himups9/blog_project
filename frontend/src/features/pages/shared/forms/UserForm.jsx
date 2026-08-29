@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import FormInput from "./FormInput";
 import FormRadio from "./FormRadio";
-import FormTextarea from "./FormTextarea";
+import FormTextarea from "./formTextarea";
 import FormFileUpload from "./FormFileUpload";
 import FacebookInput from "./FacebookInput";
 

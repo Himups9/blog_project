@@ -5,7 +5,7 @@ import Users from "../admin/pages/Users";
 
 // Feature Routes
 import adminBlogRoutes from "../blog/routes/adminBlogRoutes";
-import adminSettingsRoutes from "../settings/routes/adminSettingsRoutes";
+import adminSettingsRoutes from "../settings/routes/adminsettingsRoutes";
 import adminCategoryRoutes from "../category/routes/adminCategoryRoutes";
 import adminTagRoutes from "../tag/routes/adminTagRoutes";
 import adminCommentRoutes from "../comment/routes/adminCommentRoutes";
@@ -18,6 +18,7 @@ import CreateGallery from "../gallery/pages/CreateGallery";
 import EditGallery from "../gallery/pages/EditGallery";
 import GalleryPreview from "../gallery/components/GalleryPreview";
 import AdminGalleryPreview from "../gallery/components/AdminGalleryPreview";
+
 
 
 
