@@ -4,11 +4,11 @@ import multer from "multer";
 import path from "path";
 import crypto from "crypto";
 import fs from "fs";
+import os from "os";
 
-const tempDir = path.resolve(
-    process.cwd(),
-    "src/uploads/temp"
-);
+// Vercel/serverless functions provide a temporary writable directory.
+// Locally, this also works correctly.
+const tempDir = path.join(os.tmpdir(), "blog-uploads");
 
 if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, {
@@ -17,13 +17,11 @@ if (!fs.existsSync(tempDir)) {
 }
 
 const storage = multer.diskStorage({
-
     destination: (_req, _file, cb) => {
         cb(null, tempDir);
     },
 
     filename: (_req, file, cb) => {
-
         const extension =
             path.extname(file.originalname).toLowerCase();
 
@@ -32,7 +30,6 @@ const storage = multer.diskStorage({
 
         cb(null, filename);
     },
-
 });
 
 const allowedMimeTypes = [
@@ -42,9 +39,7 @@ const allowedMimeTypes = [
 ];
 
 const fileFilter = (_req, file, cb) => {
-
     if (!allowedMimeTypes.includes(file.mimetype)) {
-
         return cb(
             new Error(
                 "Only JPG, JPEG, PNG, and WebP images are allowed."
@@ -57,15 +52,11 @@ const fileFilter = (_req, file, cb) => {
 };
 
 const upload = multer({
-
     storage,
-
     fileFilter,
-
     limits: {
         fileSize: 5 * 1024 * 1024,
     },
-
 });
 
 export default upload;

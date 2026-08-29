@@ -29,6 +29,12 @@ const folders = [
 ];
 
 export default function createUploadFolders() {
+    // Vercel Functions should not use the project
+    // filesystem for permanent file storage.
+    if (process.env.VERCEL) {
+        return;
+    }
+
     folders.forEach((folder) => {
         const folderPath = path.resolve(__dirname, "..", folder);
 
