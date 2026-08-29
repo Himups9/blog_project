@@ -14,12 +14,13 @@ import {
 |--------------------------------------------------------------------------
 | Upload Directory
 |--------------------------------------------------------------------------
+|
+| Vercel only provides a writable temporary filesystem at /tmp.
+| Do NOT write uploads into /var/task or the project source directory.
+|
 */
 
-const uploadDirectory = path.resolve(
-    process.cwd(),
-    "src/uploads/setting/original"
-);
+const uploadDirectory = "/tmp/uploads/setting/original";
 
 /*
 |--------------------------------------------------------------------------
@@ -27,11 +28,9 @@ const uploadDirectory = path.resolve(
 |--------------------------------------------------------------------------
 */
 
-if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, {
-        recursive: true,
-    });
-}
+fs.mkdirSync(uploadDirectory, {
+    recursive: true,
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -41,9 +40,7 @@ if (!fs.existsSync(uploadDirectory)) {
 
 const fileFilter = (req, file, cb) => {
     if (
-        !SETTINGS_IMAGE_MIME_TYPES.includes(
-            file.mimetype
-        )
+        !SETTINGS_IMAGE_MIME_TYPES.includes(file.mimetype)
     ) {
         return cb(
             new Error(
@@ -58,7 +55,7 @@ const fileFilter = (req, file, cb) => {
 
 /*
 |--------------------------------------------------------------------------
-| Storage Configuration
+| Storage
 |--------------------------------------------------------------------------
 */
 
@@ -68,14 +65,13 @@ const storage = multer.diskStorage({
     },
 
     filename: (req, file, cb) => {
-        const extension = path.extname(
-            file.originalname
-        );
+        const extension = path
+            .extname(file.originalname)
+            .toLowerCase();
 
-        const filename =
-            `${Date.now()}-${crypto
-                .randomBytes(8)
-                .toString("hex")}${extension}`;
+        const filename = `${Date.now()}-${crypto
+            .randomBytes(8)
+            .toString("hex")}${extension}`;
 
         cb(null, filename);
     },
@@ -83,7 +79,7 @@ const storage = multer.diskStorage({
 
 /*
 |--------------------------------------------------------------------------
-| Multer Configuration
+| Multer
 |--------------------------------------------------------------------------
 */
 
@@ -100,26 +96,20 @@ const settingsUpload = multer({
 
 /*
 |--------------------------------------------------------------------------
-| Settings Image Upload
+| Fields
 |--------------------------------------------------------------------------
-|
-| Accept:
-| - logo
-| - favicon
-|
 */
 
-const settingsImageUpload =
-    settingsUpload.fields([
-        {
-            name: "logo",
-            maxCount: 1,
-        },
-        {
-            name: "favicon",
-            maxCount: 1,
-        },
-    ]);
+const settingsImageUpload = settingsUpload.fields([
+    {
+        name: "logo",
+        maxCount: 1,
+    },
+    {
+        name: "favicon",
+        maxCount: 1,
+    },
+]);
 
 /*
 |--------------------------------------------------------------------------
