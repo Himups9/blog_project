@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import os from "os";
 
 import categoryController from "./category.controller.js";
 
@@ -27,14 +28,15 @@ const router = Router();
 |--------------------------------------------------------------------------
 */
 
-const uploadDirectory = path.resolve(
-    process.cwd(),
-    "src/uploads/tmp"
+const uploadDirectory = path.join(
+    os.tmpdir(),
+    "blog-uploads"
 );
 
 fs.mkdirSync(uploadDirectory, {
     recursive: true,
 });
+
 
 /*
 |--------------------------------------------------------------------------
