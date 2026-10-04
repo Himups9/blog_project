@@ -35,7 +35,7 @@ const UserForm = ({
         },
     } = useForm({
 
-        resolver: zodResolver(
+        resolver: yupResolver(
             updateUserSchema
         ),
 
