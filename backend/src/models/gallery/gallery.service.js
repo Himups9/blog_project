@@ -7,6 +7,8 @@ import { deleteUploadedFiles } from "../../utils/file.js";
 import { optimizeImage } from "../../utils/image.js";
 import createGalleryImage from "../../utils/createGalleryImage.js";
 
+import uploadRoot from "../../utils/uploadPath.js";
+
 import {
     validateGalleryData,
     validateGalleryPagination,
@@ -24,15 +26,15 @@ import {
 |--------------------------------------------------------------------------
 */
 
-const UPLOADS_DIRECTORY = path.resolve(
-    process.cwd(),
-    "src/uploads"
+
+const UPLOADS_DIRECTORY = uploadRoot;
+
+const COMPOSED_DIRECTORY = path.join(
+    UPLOADS_DIRECTORY,
+    "gallery",
+    "composed"
 );
 
-const COMPOSED_DIRECTORY = path.resolve(
-    UPLOADS_DIRECTORY,
-    "gallery/composed"
-);
 
 /*
 |--------------------------------------------------------------------------

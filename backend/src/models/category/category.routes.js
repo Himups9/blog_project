@@ -1,8 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
-import os from "os";
 
 import categoryController from "./category.controller.js";
 
@@ -20,6 +18,8 @@ import authorize from "../../middleware/authorize.js";
 
 import { ROLES } from "../../constants/index.js";
 
+import uploadRoot from "../../utils/uploadPath.js";
+
 const router = Router();
 
 /*
@@ -28,15 +28,7 @@ const router = Router();
 |--------------------------------------------------------------------------
 */
 
-const uploadDirectory = path.join(
-    os.tmpdir(),
-    "blog-uploads"
-);
-
-fs.mkdirSync(uploadDirectory, {
-    recursive: true,
-});
-
+const uploadDirectory = uploadRoot;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,14 +37,14 @@ fs.mkdirSync(uploadDirectory, {
 */
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (_req, _file, cb) => {
         cb(null, uploadDirectory);
     },
 
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
         const extension = path.extname(
             file.originalname
-        );
+        ).toLowerCase();
 
         const filename = `${Date.now()}-${Math.round(
             Math.random() * 1e9
@@ -76,7 +68,7 @@ const upload = multer({
         files: 2,
     },
 
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_req, file, cb) => {
         const allowedTypes = [
             "image/jpeg",
             "image/png",

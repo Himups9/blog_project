@@ -1,13 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
-
-const uploadRoot = path.resolve(
-    process.cwd(),
-    "src/uploads"
-);
+import uploadRoot from "./uploadPath.js";
 
 /**
- * Delete a file from the upload directory.
+ * Delete an uploaded file.
+ *
+ * The path should be relative to the configured upload root.
  *
  * @param {string|null} relativePath
  * @returns {Promise<boolean>}
@@ -15,9 +13,6 @@ const uploadRoot = path.resolve(
 export const deleteUploadedFile = async (
     relativePath
 ) => {
-    /*
-     * Nothing to delete.
-     */
     if (
         typeof relativePath !== "string" ||
         !relativePath.trim()
@@ -25,38 +20,16 @@ export const deleteUploadedFile = async (
         return false;
     }
 
-    /*
-     * Remove leading slashes.
-     *
-     * Supports database values such as:
-     *
-     * /gallery/optimized/image.webp
-     *
-     * and:
-     *
-     * gallery/optimized/image.webp
-     */
-    const cleanPath =
-        relativePath
-            .trim()
-            .replace(/^[/\\]+/, "");
+    const cleanPath = relativePath
+        .trim()
+        .replace(/^[/\\]+/, "");
 
-    /*
-     * Resolve the final path inside uploads.
-     */
     const filePath = path.resolve(
         uploadRoot,
         cleanPath
     );
 
-    /*
-     * Prevent path traversal.
-     *
-     * Examples that must be rejected:
-     *
-     * ../../some-file
-     * ../../../etc/passwd
-     */
+    // Prevent path traversal.
     if (
         filePath === uploadRoot ||
         !filePath.startsWith(
@@ -73,16 +46,7 @@ export const deleteUploadedFile = async (
 
         return true;
     } catch (error) {
-        /*
-         * File has already been deleted
-         * or does not exist.
-         *
-         * This should not break Gallery
-         * deletion.
-         */
-        if (
-            error.code === "ENOENT"
-        ) {
+        if (error.code === "ENOENT") {
             return false;
         }
 
@@ -103,15 +67,11 @@ export const deleteUploadedFiles = async (
         return;
     }
 
-    for (
-        const filePath of filePaths
-    ) {
+    for (const filePath of filePaths) {
         if (!filePath) {
             continue;
         }
 
-        await deleteUploadedFile(
-            filePath
-        );
+        await deleteUploadedFile(filePath);
     }
 };

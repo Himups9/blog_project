@@ -1,14 +1,9 @@
-// src/utils/image.js
-
 import sharp from "sharp";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 
-const uploadRoot = path.resolve(
-    process.cwd(),
-    "src/uploads"
-);
+import uploadRoot from "./uploadPath.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +26,6 @@ export async function optimizeImage(
     folder,
     options = {}
 ) {
-
     if (!file) {
         return null;
     }
@@ -46,7 +40,10 @@ export async function optimizeImage(
         throw error;
     }
 
-    if (!folder) {
+    if (
+        typeof folder !== "string" ||
+        !folder.trim()
+    ) {
         const error = new Error(
             "Upload folder is required."
         );
@@ -56,6 +53,42 @@ export async function optimizeImage(
         throw error;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Normalize Folder
+    |--------------------------------------------------------------------------
+    */
+
+    const normalizedFolder = folder
+        .trim()
+        .replace(/\\/g, "/")
+        .replace(/^\/+|\/+$/g, "");
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent Path Traversal
+    |--------------------------------------------------------------------------
+    */
+
+    const folderRoot = path.resolve(
+        uploadRoot,
+        normalizedFolder
+    );
+
+    if (
+        folderRoot !== uploadRoot &&
+        !folderRoot.startsWith(
+            `${path.resolve(uploadRoot)}${path.sep}`
+        )
+    ) {
+        const error = new Error(
+            "Invalid upload folder."
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -77,20 +110,13 @@ export async function optimizeImage(
         preserveOriginal = true,
 
         thumbnailFit = "cover",
-
     } = options;
-
 
     /*
     |--------------------------------------------------------------------------
     | Folder Paths
     |--------------------------------------------------------------------------
     */
-
-    const folderRoot = path.join(
-        uploadRoot,
-        folder
-    );
 
     const originalDir = path.join(
         folderRoot,
@@ -107,7 +133,6 @@ export async function optimizeImage(
         "thumbnails"
     );
 
-
     /*
     |--------------------------------------------------------------------------
     | Create Directories
@@ -122,27 +147,22 @@ export async function optimizeImage(
     );
 
     if (preserveOriginal) {
-
         await fs.mkdir(
             originalDir,
             {
                 recursive: true,
             }
         );
-
     }
 
     if (generateThumbnail) {
-
         await fs.mkdir(
             thumbnailDir,
             {
                 recursive: true,
             }
         );
-
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -153,7 +173,6 @@ export async function optimizeImage(
     const baseName =
         `${Date.now()}-${crypto.randomUUID()}`;
 
-
     /*
     |--------------------------------------------------------------------------
     | Original Extension
@@ -162,16 +181,14 @@ export async function optimizeImage(
 
     const originalExtension =
         path.extname(
-            file.originalname
+            file.originalname || ""
         ).toLowerCase() || ".jpg";
-
 
     const originalFilename =
         `${baseName}${originalExtension}`;
 
     const optimizedFilename =
         `${baseName}.webp`;
-
 
     /*
     |--------------------------------------------------------------------------
@@ -194,9 +211,7 @@ export async function optimizeImage(
         optimizedFilename
     );
 
-
     try {
-
         /*
         |--------------------------------------------------------------------------
         | Preserve Original
@@ -204,14 +219,11 @@ export async function optimizeImage(
         */
 
         if (preserveOriginal) {
-
             await fs.copyFile(
                 file.path,
                 originalPath
             );
-
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -225,20 +237,16 @@ export async function optimizeImage(
                 .resize({
                     width,
                     height,
-                    fit: height
-                        ? "inside"
-                        : "inside",
+                    fit: "inside",
                     withoutEnlargement: true,
                 })
                 .webp({
                     quality,
                 });
 
-
         await optimizedImage.toFile(
             optimizedPath
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -247,7 +255,6 @@ export async function optimizeImage(
         */
 
         if (generateThumbnail) {
-
             await sharp(file.path)
                 .rotate()
                 .resize({
@@ -262,9 +269,7 @@ export async function optimizeImage(
                 .toFile(
                     thumbnailPath
                 );
-
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -276,7 +281,6 @@ export async function optimizeImage(
             file.path
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Return Relative Paths
@@ -284,32 +288,27 @@ export async function optimizeImage(
         */
 
         return {
-
             originalPath:
                 preserveOriginal
-                    ? `${folder}/original/${originalFilename}`
+                    ? `${normalizedFolder}/original/${originalFilename}`
                     : null,
 
             optimizedPath:
-                `${folder}/optimized/${optimizedFilename}`,
+                `${normalizedFolder}/optimized/${optimizedFilename}`,
 
             thumbnailPath:
                 generateThumbnail
-                    ? `${folder}/thumbnails/${optimizedFilename}`
+                    ? `${normalizedFolder}/thumbnails/${optimizedFilename}`
                     : null,
-
         };
-
     } catch (error) {
-
         /*
         |--------------------------------------------------------------------------
-        | Cleanup
+        | Cleanup Generated Files
         |--------------------------------------------------------------------------
         */
 
         const filesToDelete = [
-
             preserveOriginal
                 ? originalPath
                 : null,
@@ -319,28 +318,21 @@ export async function optimizeImage(
             generateThumbnail
                 ? thumbnailPath
                 : null,
-
         ].filter(Boolean);
-
 
         await Promise.all(
             filesToDelete.map(
                 async (filePath) => {
-
                     try {
-
                         await fs.unlink(
                             filePath
                         );
-
                     } catch {
                         // File may not exist.
                     }
-
                 }
             )
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -349,15 +341,12 @@ export async function optimizeImage(
         */
 
         try {
-
             await fs.unlink(
                 file.path
             );
-
         } catch {
             // Temporary file may already be removed.
         }
-
 
         throw error;
     }

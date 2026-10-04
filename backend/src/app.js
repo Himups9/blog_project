@@ -1,15 +1,13 @@
-
-// backend/src/app.js
-
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from "path";
 
 import routes from "./routes/index.js";
 
 import notFoundMiddleware from "./middleware/notFound.middleware.js";
 import errorMiddleware from "./middleware/error.middleware.js";
+
+import uploadRoot from "./utils/uploadPath.js";
 
 const app = express();
 
@@ -47,14 +45,15 @@ app.use(
             }
 
             return callback(
-                new Error(`CORS blocked origin: ${origin}`)
+                new Error(
+                    `CORS blocked origin: ${origin}`
+                )
             );
         },
 
         credentials: true,
     })
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -65,7 +64,6 @@ app.use(
 app.use(
     express.json()
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -79,7 +77,6 @@ app.use(
     })
 );
 
-
 /*
 |--------------------------------------------------------------------------
 | Cookies
@@ -90,23 +87,28 @@ app.use(
     cookieParser()
 );
 
-
 /*
 |--------------------------------------------------------------------------
 | Static Uploaded Files
 |--------------------------------------------------------------------------
+|
+| Local:
+|   src/uploads
+|
+| Vercel:
+|   /tmp/blog-uploads
+|
+| Note:
+| Vercel's /tmp filesystem is temporary.
+| Permanent production image storage should use
+| object storage such as Cloudinary, S3, R2, etc.
+|--------------------------------------------------------------------------
 */
-
-const uploadDirectory = path.resolve(
-    process.cwd(),
-    "src/uploads"
-);
 
 app.use(
     "/uploads",
-    express.static(uploadDirectory)
+    express.static(uploadRoot)
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -118,7 +120,6 @@ app.use(
     "/api",
     routes
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -132,7 +133,6 @@ app.get("/", (req, res) => {
         message: "Welcome to the Blog CMS API",
     });
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -148,7 +148,6 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | 404 Handler
@@ -159,7 +158,6 @@ app.use(
     notFoundMiddleware
 );
 
-
 /*
 |--------------------------------------------------------------------------
 | Global Error Handler
@@ -169,6 +167,5 @@ app.use(
 app.use(
     errorMiddleware
 );
-
 
 export default app;
