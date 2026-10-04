@@ -1,3 +1,4 @@
+
 // backend/src/app.js
 
 import express from "express";
@@ -20,12 +21,35 @@ const app = express();
 
 /*
  * CORS
+ *
+ * Allowed frontend origins:
+ * - Local development
+ * - Vercel frontend
+ * - Production custom domain
  */
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://blog-project-p1q6.vercel.app",
+    "https://www.himalayatech.com.np",
+    "https://himalayatech.com.np",
+];
+
 app.use(
     cors({
-        origin:
-            process.env.FRONTEND_URL ||
-            "http://localhost:5173",
+        origin: (origin, callback) => {
+            // Allow requests without an Origin header
+            if (!origin) {
+                return callback(null, true);
+            }
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(
+                new Error(`CORS blocked origin: ${origin}`)
+            );
+        },
 
         credentials: true,
     })
@@ -33,19 +57,22 @@ app.use(
 
 
 /*
- * JSON Requests
- *
- * Used for:
- * application/json
- */
+|--------------------------------------------------------------------------
+| JSON Requests
+|--------------------------------------------------------------------------
+*/
+
 app.use(
     express.json()
 );
 
 
 /*
- * URL Encoded Requests
- */
+|--------------------------------------------------------------------------
+| URL Encoded Requests
+|--------------------------------------------------------------------------
+*/
+
 app.use(
     express.urlencoded({
         extended: true,
@@ -54,8 +81,11 @@ app.use(
 
 
 /*
- * Cookies
- */
+|--------------------------------------------------------------------------
+| Cookies
+|--------------------------------------------------------------------------
+*/
+
 app.use(
     cookieParser()
 );
@@ -65,22 +95,6 @@ app.use(
 |--------------------------------------------------------------------------
 | Static Uploaded Files
 |--------------------------------------------------------------------------
-|
-| Physical directory:
-|
-| src/uploads/
-|
-| Public URL:
-|
-| http://localhost:5000/uploads/...
-|
-| Examples:
-|
-| /uploads/users/optimized/profile.webp
-| /uploads/users/thumbnails/profile.webp
-| /uploads/gallery/optimized/image.webp
-| /uploads/blogs/optimized/blog.webp
-|
 */
 
 const uploadDirectory = path.resolve(
@@ -98,18 +112,6 @@ app.use(
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| All application API routes:
-|
-| /api/auth
-| /api/users
-| /api/categories
-| /api/tags
-| /api/blogs
-| /api/comments
-| /api/gallery
-| /api/settings
-|
 */
 
 app.use(
