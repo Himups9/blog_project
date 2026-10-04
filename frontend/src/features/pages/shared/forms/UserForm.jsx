@@ -1,23 +1,20 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-
 import FormInput from "./FormInput";
 import FormRadio from "./FormRadio";
 import FormTextarea from "./formTextarea";
 import FormFileUpload from "./FormFileUpload";
 import FacebookInput from "./FacebookInput";
 
-import { updateUserSchema } from "../../../utils/validators";
-
-
 const UserForm = ({
     user,
-    onSubmit,
+    register,
+    errors,
+    watch,
     isSubmitting = false,
     showPassword = false,
     showEmail = true,
+    currentImage = null,
 }) => {
+<<<<<<< HEAD
 
     /*
     |--------------------------------------------------------------------------
@@ -211,22 +208,16 @@ const UserForm = ({
     |--------------------------------------------------------------------------
     */
 
+=======
+>>>>>>> 9770d0b (fix: resolve registration form submission)
     return (
-
-        <form
-            id="edit-user-form"
-            onSubmit={
-                handleSubmit(submitForm)
-            }
-            className="space-y-6"
-        >
+        <div className="space-y-6">
 
             {/* =========================================================
                 Email
             ========================================================== */}
 
             {showEmail && (
-
                 <FormInput
                     name="email"
                     type="email"
@@ -235,9 +226,7 @@ const UserForm = ({
                     errors={errors}
                     disabled={isSubmitting}
                 />
-
             )}
-
 
             {/* =========================================================
                 Phone
@@ -252,7 +241,6 @@ const UserForm = ({
                 disabled={isSubmitting}
             />
 
-
             {/* =========================================================
                 First Name
             ========================================================== */}
@@ -265,7 +253,6 @@ const UserForm = ({
                 disabled={isSubmitting}
             />
 
-
             {/* =========================================================
                 Last Name
             ========================================================== */}
@@ -277,7 +264,6 @@ const UserForm = ({
                 errors={errors}
                 disabled={isSubmitting}
             />
-
 
             {/* =========================================================
                 Gender
@@ -305,7 +291,6 @@ const UserForm = ({
                 ]}
             />
 
-
             {/* =========================================================
                 Position
             ========================================================== */}
@@ -322,7 +307,6 @@ const UserForm = ({
                 disabled={isSubmitting}
             />
 
-
             {/* =========================================================
                 Profile Image
             ========================================================== */}
@@ -335,10 +319,9 @@ const UserForm = ({
                 watch={watch}
                 disabled={isSubmitting}
                 currentImage={
-                    user?.profileImage || null
+                    user?.profileImage || currentImage || null
                 }
             />
-
 
             {/* =========================================================
                 Facebook
@@ -350,78 +333,65 @@ const UserForm = ({
                 disabled={isSubmitting}
             />
 
-
             {/* =========================================================
                 Role
             ========================================================== */}
 
-            <FormInput
-                name="role"
-                label="Role"
-                register={register}
-                errors={errors}
-                disabled={isSubmitting}
-            />
-
+            {user && (
+                <FormInput
+                    name="role"
+                    label="Role"
+                    register={register}
+                    errors={errors}
+                    disabled={isSubmitting}
+                />
+            )}
 
             {/* =========================================================
                 Account Status
             ========================================================== */}
 
-            <div className="grid gap-4 md:grid-cols-2">
+            {user && (
+                <div className="grid gap-4 md:grid-cols-2">
 
-                {/* Active */}
+                    {/* Active */}
 
-                <label className="flex items-center gap-3">
+                    <label className="flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            {...register("isActive")}
+                            disabled={isSubmitting}
+                            className="h-4 w-4"
+                        />
 
-                    <input
-                        type="checkbox"
-                        {...register(
-                            "isActive"
-                        )}
-                        disabled={
-                            isSubmitting
-                        }
-                        className="h-4 w-4"
-                    />
+                        <span className="text-sm font-medium text-slate-700">
+                            Active User
+                        </span>
+                    </label>
 
-                    <span className="text-sm font-medium text-slate-700">
-                        Active User
-                    </span>
+                    {/* Verified */}
 
-                </label>
+                    <label className="flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            {...register("isVerified")}
+                            disabled={isSubmitting}
+                            className="h-4 w-4"
+                        />
 
+                        <span className="text-sm font-medium text-slate-700">
+                            Email Verified
+                        </span>
+                    </label>
 
-                {/* Verified */}
-
-                <label className="flex items-center gap-3">
-
-                    <input
-                        type="checkbox"
-                        {...register(
-                            "isVerified"
-                        )}
-                        disabled={
-                            isSubmitting
-                        }
-                        className="h-4 w-4"
-                    />
-
-                    <span className="text-sm font-medium text-slate-700">
-                        Email Verified
-                    </span>
-
-                </label>
-
-            </div>
-
+                </div>
+            )}
 
             {/* =========================================================
                 Password
             ========================================================== */}
 
             {showPassword && (
-
                 <div className="grid gap-4 md:grid-cols-2">
 
                     <FormInput
@@ -443,9 +413,7 @@ const UserForm = ({
                     />
 
                 </div>
-
             )}
-
 
             {/* =========================================================
                 Bio
@@ -464,9 +432,13 @@ const UserForm = ({
                 disabled={isSubmitting}
             />
 
-        </form>
+        </div>
     );
 };
 
+<<<<<<< HEAD
 
 export default UserForm;
+=======
+export default UserForm;
+>>>>>>> 9770d0b (fix: resolve registration form submission)
