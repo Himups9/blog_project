@@ -117,7 +117,7 @@ const Register = () => {
                     {/* Form */}
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="grid grid-cols-1 gap-4 px-0 sm:px-2 md:grid-cols-2 md:gap-6 md:px-4"
+                        className="px-0 sm:px-2 md:px-4"
                     >
                         <UserForm
                             register={register}
@@ -133,7 +133,7 @@ const Register = () => {
                             loading={isSubmitting}
                             text="Create Account"
                             loadingText="Creating Account..."
-                            className="md:col-span-2"
+                            className="mt-6 w-full"
                         />
                     </form>
 
